@@ -1,0 +1,218 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.22.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "e74e8d1e04dabfc5bc896ade9081d9df",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"poc-detection-de-fraude-transactionnelle-pis\">POC : D\u00e9tection de Fraude Transactionnelle (PIS)</h1>\n<span class=\"paragraph\"><em>M\u00e9moire acad\u00e9mique : L'IA au service de l'Open Finance</em></span>\n<span class=\"paragraph\">Ce prototype compare deux approches pour la d\u00e9tection de fraudes dans un flux de paiement :</span>\n<ol>\n<li><strong>Mod\u00e8le A (Legacy)</strong> : Un syst\u00e8me expert bas\u00e9 sur des r\u00e8gles d\u00e9terministes.</li>\n<li><strong>Mod\u00e8le B (IA)</strong> : Un classifieur Random Forest entra\u00een\u00e9 sur l'exp\u00e9rience pass\u00e9e.</li>\n</ol>\n<span class=\"paragraph\">Dataset: <em><a href=\"https://www.kaggle.com/datasets/ealaxi/banksim1?select=bs140513_032310.csv\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.kaggle.com/datasets/ealaxi/banksim1?select=bs140513_032310.csv</a></em></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "699b8949d60a446b833d1534ab686760",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "2bafa737f24ee702745d4500d000d34c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"1-preparation-des-donnees-data-engineering\">1. Pr\u00e9paration des Donn\u00e9es (Data Engineering)</h2>\n<span class=\"paragraph\">Nous utilisons le dataset <strong>BankSim</strong>. Les colonnes inutiles sont supprim\u00e9es, les cha\u00eenes sont nettoy\u00e9es, et les variables cat\u00e9gorielles sont encod\u00e9es.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "e5e42d0306b8575406baaba4376d3087",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "eaca948da2074cbf29b05c099ed9e8db",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='PKri-0' random-id='cbd4051b-1eba-9e5c-403d-f7c3d1ef1ef0'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;step&#92;&quot;:0,&#92;&quot;customer&#92;&quot;:&#92;&quot;&#x27;C1093826151&#x27;&#92;&quot;,&#92;&quot;age&#92;&quot;:&#92;&quot;&#x27;4&#x27;&#92;&quot;,&#92;&quot;gender&#92;&quot;:&#92;&quot;&#x27;M&#x27;&#92;&quot;,&#92;&quot;merchant&#92;&quot;:&#92;&quot;&#x27;M348934600&#x27;&#92;&quot;,&#92;&quot;category&#92;&quot;:&#92;&quot;&#x27;es_transportation&#x27;&#92;&quot;,&#92;&quot;amount&#92;&quot;:4.55,&#92;&quot;fraud&#92;&quot;:0},{&#92;&quot;step&#92;&quot;:0,&#92;&quot;customer&#92;&quot;:&#92;&quot;&#x27;C352968107&#x27;&#92;&quot;,&#92;&quot;age&#92;&quot;:&#92;&quot;&#x27;2&#x27;&#92;&quot;,&#92;&quot;gender&#92;&quot;:&#92;&quot;&#x27;M&#x27;&#92;&quot;,&#92;&quot;merchant&#92;&quot;:&#92;&quot;&#x27;M348934600&#x27;&#92;&quot;,&#92;&quot;category&#92;&quot;:&#92;&quot;&#x27;es_transportation&#x27;&#92;&quot;,&#92;&quot;amount&#92;&quot;:39.68,&#92;&quot;fraud&#92;&quot;:0},{&#92;&quot;step&#92;&quot;:0,&#92;&quot;customer&#92;&quot;:&#92;&quot;&#x27;C2054744914&#x27;&#92;&quot;,&#92;&quot;age&#92;&quot;:&#92;&quot;&#x27;4&#x27;&#92;&quot;,&#92;&quot;gender&#92;&quot;:&#92;&quot;&#x27;F&#x27;&#92;&quot;,&#92;&quot;merchant&#92;&quot;:&#92;&quot;&#x27;M1823072687&#x27;&#92;&quot;,&#92;&quot;category&#92;&quot;:&#92;&quot;&#x27;es_transportation&#x27;&#92;&quot;,&#92;&quot;amount&#92;&quot;:26.89,&#92;&quot;fraud&#92;&quot;:0},{&#92;&quot;step&#92;&quot;:0,&#92;&quot;customer&#92;&quot;:&#92;&quot;&#x27;C1760612790&#x27;&#92;&quot;,&#92;&quot;age&#92;&quot;:&#92;&quot;&#x27;3&#x27;&#92;&quot;,&#92;&quot;gender&#92;&quot;:&#92;&quot;&#x27;M&#x27;&#92;&quot;,&#92;&quot;merchant&#92;&quot;:&#92;&quot;&#x27;M348934600&#x27;&#92;&quot;,&#92;&quot;category&#92;&quot;:&#92;&quot;&#x27;es_transportation&#x27;&#92;&quot;,&#92;&quot;amount&#92;&quot;:17.25,&#92;&quot;fraud&#92;&quot;:0},{&#92;&quot;step&#92;&quot;:0,&#92;&quot;customer&#92;&quot;:&#92;&quot;&#x27;C757503768&#x27;&#92;&quot;,&#92;&quot;age&#92;&quot;:&#92;&quot;&#x27;5&#x27;&#92;&quot;,&#92;&quot;gender&#92;&quot;:&#92;&quot;&#x27;M&#x27;&#92;&quot;,&#92;&quot;merchant&#92;&quot;:&#92;&quot;&#x27;M348934600&#x27;&#92;&quot;,&#92;&quot;category&#92;&quot;:&#92;&quot;&#x27;es_transportation&#x27;&#92;&quot;,&#92;&quot;amount&#92;&quot;:35.72,&#92;&quot;fraud&#92;&quot;:0}]&quot;' data-total-rows='5' data-total-columns='8' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;step&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;customer&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;age&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;gender&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;merchant&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;category&quot;,[&quot;string&quot;,&quot;str&quot;]],[&quot;amount&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;fraud&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "64c27309dba01ae0d4586b52d53e5456",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='07f0d890-19c5-b4e9-bded-3bc5663e6197'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:&#92;&quot;step&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;int64&#92;&quot;},{&#92;&quot;&#92;&quot;:&#92;&quot;customer&#92;&quot;,&#92;&quot;value&#92;&quot;:{&#92;&quot;_storage&#92;&quot;:&#92;&quot;python&#92;&quot;,&#92;&quot;_na_value&#92;&quot;:NaN}},{&#92;&quot;&#92;&quot;:&#92;&quot;age&#92;&quot;,&#92;&quot;value&#92;&quot;:{&#92;&quot;_storage&#92;&quot;:&#92;&quot;python&#92;&quot;,&#92;&quot;_na_value&#92;&quot;:NaN}},{&#92;&quot;&#92;&quot;:&#92;&quot;gender&#92;&quot;,&#92;&quot;value&#92;&quot;:{&#92;&quot;_storage&#92;&quot;:&#92;&quot;python&#92;&quot;,&#92;&quot;_na_value&#92;&quot;:NaN}},{&#92;&quot;&#92;&quot;:&#92;&quot;merchant&#92;&quot;,&#92;&quot;value&#92;&quot;:{&#92;&quot;_storage&#92;&quot;:&#92;&quot;python&#92;&quot;,&#92;&quot;_na_value&#92;&quot;:NaN}},{&#92;&quot;&#92;&quot;:&#92;&quot;category&#92;&quot;,&#92;&quot;value&#92;&quot;:{&#92;&quot;_storage&#92;&quot;:&#92;&quot;python&#92;&quot;,&#92;&quot;_na_value&#92;&quot;:NaN}},{&#92;&quot;&#92;&quot;:&#92;&quot;amount&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;float64&#92;&quot;},{&#92;&quot;&#92;&quot;:&#92;&quot;fraud&#92;&quot;,&#92;&quot;value&#92;&quot;:&#92;&quot;int64&#92;&quot;}]&quot;' data-total-rows='8' data-total-columns='1' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;value&quot;,[&quot;string&quot;,&quot;object&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;string&quot;,&quot;str&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "fd3992fbacbc3ddb98349ac92caf9eba",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "599547ce33a016ac408eee827fddaa64",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"2-modeles-de-detection\">2. Mod\u00e8les de D\u00e9tection</h2>\n<h3 id=\"modele-a-systeme-expert-baseline\">Mod\u00e8le A : Syst\u00e8me Expert (Baseline)</h3>\n<span class=\"paragraph\">Bas\u00e9 sur une r\u00e8gle m\u00e9tier classique :</span>\n<ul>\n<li>Blocage au-dessus de 1000\u20ac syst\u00e9matiquement.</li>\n<li>Blocage au-dessus de 500\u20ac pour certaines cat\u00e9gories \u00e0 risque ('leisure', 'travel').</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "570c771f044f5020dd5ec2beedfa43b1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "c71ddbbad9a8d8af1f806080d9184773",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"modele-b-ia-random-forest\">Mod\u00e8le B : IA (Random Forest)</h3>\n<span class=\"paragraph\">Utilisation d'une for\u00eat al\u00e9atoire avec gestion du d\u00e9s\u00e9quilibre des classes (<code>class_weight='balanced'</code>).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "b9c5f4af33ede2e6b9bf7f355c6ad776",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "Entra\u00eenement du mod\u00e8le en cours...\nPr\u00e9paration termin\u00e9e. Pr\u00eat pour l'\u00e9valuation des mod\u00e8les.\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "54b70183b3486f3ba934b353a08f3b60",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"3-evaluation-et-analyse-comparative\">3. \u00c9valuation et Analyse Comparative</h2>\n<span class=\"paragraph\">Nous comparons les performances sur le set de test.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "af02bfc0645033500f8b1ea1a7b2d2e5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "--- Mod\u00e8le A (Legacy) ---\n              precision    recall  f1-score   support\n\n           0       0.99      1.00      0.99    176233\n           1       0.95      0.09      0.16      2160\n\n    accuracy                           0.99    178393\n   macro avg       0.97      0.54      0.58    178393\nweighted avg       0.99      0.99      0.98    178393\n\nConfusion Matrix:\n[[176223     10]\n [  1971    189]]\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "iLit",
+      "code_hash": "afc2574eef2ae3569e7c4b191a97326e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"4-analyse-de-limpact-business\">4. Analyse de l'Impact Business</h2>\n<span class=\"paragraph\">Calcul des gains en termes de Faux Positifs \u00e9vit\u00e9s (meilleure UX) et de fraudes captur\u00e9es (S\u00e9curit\u00e9).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
