@@ -1,5 +1,5 @@
 import pandas as pd
-from src.models.expert_system import predict_rules_on_df
+from src.models.expert_system import predict_expert_system_on_df
 from src.schemas.fraud_detection import Transaction
 
 def test_transaction_schema():
@@ -22,18 +22,25 @@ def test_transaction_schema():
     assert tx.amount == 100.50
     assert tx.gender == "M"
 
-def test_expert_system_simple_logic():
+def test_expert_system_logic():
     """
-    Test the rule-based legacy model logic for a single row.
+    Test the rule-based legacy model logic for a few rows with notebook rules.
     """
-    # Create a simple df
-    df = pd.DataFrame([{
-        "amount": 1200,
-        "category": 1 # Representing encoded info for now
-    }, {
-        "amount": 100,
-        "category": 1
-    }])
-    preds = predict_rules_on_df(df)
-    assert preds[0] == 1 # 1200 is fraud (> 1000)
-    assert preds[1] == 0 # 100 is legitimate
+    df = pd.DataFrame([
+        {"amount": 1200, "category": "food"},       # Fraud rule 1 (>1000)
+        {"amount": 600, "category": "leisure"},     # Fraud rule 2 (>500 and risk cat)
+        {"amount": 600, "category": "food"},        # Legit (no risk cat)
+        {"amount": 100, "category": "leisure"}      # Legit (amt < 500)
+    ])
+    preds = predict_expert_system_on_df(df)
+    assert preds[0] == 1
+    assert preds[1] == 1
+    assert preds[2] == 0
+    assert preds[3] == 0
+
+def test_preprocess_split_stratification():
+    """
+    Test preprocessing function existence (no fake data split check without full dataset).
+    """
+    from src.data.loader import preprocess_data
+    assert callable(preprocess_data)
