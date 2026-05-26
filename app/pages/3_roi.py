@@ -205,6 +205,7 @@ with col_r:
         delta="Recall IA vs Legacy",
     )
     st.caption(
-        "L'IA capture plus de fraudes réelles que le système expert, tout en générant moins de fausses alertes. "
-        "C'est l'équilibre Précision-Rappel recherché par les équipes de conformité Open Banking."
+        "L'IA capture considérablement plus de fraudes réelles que le système expert, mais génère logiquement "
+        "un plus grand nombre de fausses alertes. Le défi est d'affiner cet équilibre Précision-Rappel pour "
+        "les équipes de conformité Open Banking."
     )
