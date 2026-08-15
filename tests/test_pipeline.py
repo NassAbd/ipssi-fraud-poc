@@ -40,7 +40,27 @@ def test_expert_system_logic():
 
 def test_preprocess_split_stratification():
     """
-    Test preprocessing function existence (no fake data split check without full dataset).
+    Test preprocessing function pipeline logic with a dummy dataframe.
     """
     from src.data.loader import preprocess_data
-    assert callable(preprocess_data)
+    df = pd.DataFrame({
+        "step": [1]*10,
+        "age": ["20-30"]*10,
+        "gender": ["M", "F"]*5,
+        "category": ["food", "leisure"]*5,
+        "amount": [10, 50, 100, 200, 300, 400, 500, 600, 700, 800],
+        "fraud": [0, 0, 0, 0, 0, 1, 1, 1, 0, 0]
+    })
+    
+    X_train, X_test, y_train, y_test, X_test_raw = preprocess_data(
+        df, features=["step", "age", "gender", "category", "amount"]
+    )
+    
+    assert len(X_train) == 7
+    assert len(X_test) == 3
+    assert "amount" in X_train.columns
+    # Check that scale transformed the amount (not identical)
+    assert X_train["amount"].iloc[0] != 10
+    
+    # Check that test shape is correct
+    assert X_train.shape[1] == 5

@@ -1,2 +1,0 @@
-https://www.kaggle.com/datasets/aryan208/financial-transactions-dataset-for-fraud-detection
-https://www.kaggle.com/datasets/ealaxi/banksim1

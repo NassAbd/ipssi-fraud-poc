@@ -1,3 +1,6 @@
+# System files
+.DS_Store
+
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -14,3 +17,10 @@ wheels/
 
 # Model artifacts
 models/*.joblib
+
+# Academic content (LaTeX & assets)
+*.tex
+images/
+screenshots/
+
+

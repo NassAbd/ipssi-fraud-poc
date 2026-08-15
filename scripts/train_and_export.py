@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import joblib
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
@@ -58,15 +58,27 @@ def main(data_path: str) -> None:
     X_train["amount"] = scaler.fit_transform(X_train[["amount"]])
     X_test["amount"] = scaler.transform(X_test[["amount"]])
 
-    print("[4/4] Training Random Forest...")
-    rf = RandomForestClassifier(
-        n_estimators=100,
-        class_weight="balanced",
-        random_state=42,
-        max_depth=10,
+    print("[4/4] Fine-tuning Random Forest with GridSearchCV...")
+    base_rf = RandomForestClassifier(random_state=42, n_jobs=-1)
+    
+    param_grid = {
+        "n_estimators": [50, 100],
+        "max_depth": [5, 10, None],
+        "class_weight": ["balanced", "balanced_subsample"]
+    }
+    
+    grid_search = GridSearchCV(
+        estimator=base_rf,
+        param_grid=param_grid,
+        scoring="f1",
+        cv=3,
         n_jobs=-1,
+        verbose=1
     )
-    rf.fit(X_train, y_train)
+    
+    grid_search.fit(X_train, y_train)
+    rf = grid_search.best_estimator_
+    print(f"Best parameters found: {grid_search.best_params_}")
 
     # Evaluate on test set
     y_pred = rf.predict(X_test)

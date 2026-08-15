@@ -26,3 +26,21 @@ class ModelMetrics(BaseModel):
     recall: float = Field(..., ge=0, le=1)
     f1_score: float = Field(..., ge=0, le=1)
     accuracy: float = Field(..., ge=0, le=1)
+
+class TransactionInput(BaseModel):
+    """
+    Schema for real-time transaction simulation input.
+    """
+    step: int = Field(..., gt=0)
+    age: str = Field(...)
+    gender: Literal['M', 'F', 'E', 'U'] = Field(...)
+    category: str = Field(...)
+    amount: float = Field(..., gt=0)
+
+class RiskScoreOutput(BaseModel):
+    """
+    Schema for the real-time API response.
+    """
+    risk_score: float = Field(..., ge=0, le=1, description="Probability of fraud (0 to 1)")
+    is_fraud: bool = Field(..., description="True if risk_score >= threshold")
+    explanation: dict = Field(default_factory=dict, description="SHAP feature contributions")

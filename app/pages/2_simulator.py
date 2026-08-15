@@ -12,10 +12,12 @@ sys.path.insert(0, str(ROOT))
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+import shap
 
 from app.styles import PREMIUM_CSS, verdict_card
 from app.utils import load_model, load_scaler, load_label_encoders
 from src.models.expert_system import predict_legacy
+from src.schemas.fraud_detection import TransactionInput, RiskScoreOutput
 
 st.set_page_config(page_title="Simulateur · Fraud POC", page_icon="💳", layout="wide")
 st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
@@ -24,6 +26,44 @@ st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
 rf_model = load_model()
 scaler = load_scaler()
 label_encoders = load_label_encoders()
+
+# ── Mock API Function ────────────────────────────────────────────────────────
+def predict_realtime(tx: TransactionInput) -> RiskScoreOutput:
+    """Mock API endpoint processing a transaction and returning SHAP explainability."""
+    row_df = pd.DataFrame([tx.model_dump()])
+    
+    # Preprocess
+    for col_name in ["age", "gender", "category"]:
+        le = label_encoders[col_name]
+        val = row_df[col_name].iloc[0]
+        row_df[col_name] = le.transform([val])[0] if val in le.classes_ else -1
+        
+    row_df["amount"] = scaler.transform(row_df[["amount"]])
+    
+    # Predict
+    rf_prob = float(rf_model.predict_proba(row_df)[0, 1])
+    rf_result = rf_prob >= 0.5
+    
+    # SHAP Explainability
+    explainer = shap.TreeExplainer(rf_model)
+    shap_values = explainer.shap_values(row_df)
+    
+    # Handle SHAP output format depending on sklearn/shap version
+    if isinstance(shap_values, list):
+        shap_vals_1 = shap_values[1][0]
+    else:
+        if len(shap_values.shape) == 3:
+            shap_vals_1 = shap_values[0, :, 1]
+        else:
+            shap_vals_1 = shap_values[0]
+            
+    explanation = {feat: float(val) for feat, val in zip(row_df.columns, shap_vals_1)}
+    
+    return RiskScoreOutput(
+        risk_score=rf_prob,
+        is_fraud=rf_result,
+        explanation=explanation
+    )
 
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown(
@@ -79,20 +119,19 @@ if submitted:
         else "Transaction dans les seuils acceptables"
     )
 
-    # ---- Random Forest ----
-    # Encode the transaction the same way as training
-    row_dict = {"step": step, "age": age, "gender": gender, "category": category, "amount": amount}
-    row_df = pd.DataFrame([row_dict])
-
-    for col_name in ["age", "gender", "category"]:
-        le = label_encoders[col_name]
-        val = row_df[col_name].iloc[0]
-        row_df[col_name] = le.transform([val])[0] if val in le.classes_ else -1
-
-    row_df["amount"] = scaler.transform(row_df[["amount"]])
-
-    rf_prob = float(rf_model.predict_proba(row_df)[0, 1])
-    rf_result = 1 if rf_prob >= 0.5 else 0
+    from typing import cast, Literal
+    gender_literal = cast(Literal["M", "F", "E", "U"], gender)
+    tx_input = TransactionInput(
+        step=step,
+        age=age,
+        gender=gender_literal,
+        category=category,
+        amount=amount
+    )
+    
+    response = predict_realtime(tx_input)
+    rf_prob = response.risk_score
+    rf_result = 1 if response.is_fraud else 0
     rf_reason = f"Score de risque IA : {rf_prob * 100:.1f}%"
 
     # ─ Display cards ─────────────────────────────────────────────────────────
@@ -145,6 +184,33 @@ if submitted:
         height=260,
     )
     st.plotly_chart(fig_gauge, use_container_width=True)
+
+    # ─ SHAP Explainability ───────────────────────────────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 🧠 Explicabilité du modèle (Valeurs SHAP)")
+    st.caption("Cette analyse permet de comprendre instantanément ce qui a poussé l'IA vers la fraude ou la légitimité.")
+    
+    shap_dict = response.explanation
+    shap_df = pd.DataFrame(list(shap_dict.items()), columns=["Variable", "Impact"])
+    shap_df = shap_df.sort_values(by="Impact", ascending=True)
+    
+    fig_shap = go.Figure(go.Bar(
+        x=shap_df["Impact"],
+        y=shap_df["Variable"],
+        orientation='h',
+        marker_color=["#FF4B6E" if v > 0 else "#00D4A1" for v in shap_df["Impact"]]
+    ))
+    fig_shap.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#FAFAFA"),
+        title="Contribution des variables au score de risque (Rouge = Augmente, Vert = Baisse)",
+        xaxis=dict(title="Impact SHAP", gridcolor="rgba(255,255,255,0.05)"),
+        yaxis=dict(gridcolor="rgba(0,0,0,0)"),
+        margin=dict(t=30, b=20, l=20, r=20),
+        height=300,
+    )
+    st.plotly_chart(fig_shap, use_container_width=True)
 
     # ─ Narrative ─────────────────────────────────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
